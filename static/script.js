@@ -1,17 +1,21 @@
-const inputElement = document.getElementById('test');
+const video = document.getElementById('webcam');
+const canvas = document.getElementById('snapshot');
+const ctx = canvas.getContext('2d');
+
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => { video.srcObject = stream; })
+    .catch(err => console.error("Camera error: ", err));
 
 async function sendToPython() {
-    // 1. Grab the element
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     
-    // 2. LOG IT to see if it's actually finding the text
-    console.log("Input Element found:", inputElement);
-    const textValue = inputElement.innerHTML ? inputElement.innerHTML : "ELEMENT NOT FOUND";
-    console.log("Value being sent:", textValue);
+    const imageData = canvas.toDataURL('image/jpeg', 0.6);
+    console.log("Value being sent:", imageData);
 
     const response = await fetch('/get_text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "extracted_text": textValue })
+        body: JSON.stringify({ "extracted_text": imageData })
     });
 
     if (response.ok) {

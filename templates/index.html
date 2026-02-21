@@ -12,10 +12,12 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
-        <h1 id="test">TEST</h1>
+        <video id="webcam" autoplay playsinline width="400" height="300"></video>
+
+        <canvas id="snapshot" width="400" height="300" style="display:none;"></canvas>
         <h1 id="pyRes">pyRes</h1>
 
-        <button onclick="sendToPython()">Test Flask</button>
+        <button onclick="sendToPython()">Process Frame</button>
     </body>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </html>
