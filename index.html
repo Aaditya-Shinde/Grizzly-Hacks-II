@@ -1,31 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Grizzly Hacks II</title>
-        <!-- CHANGE THIS LATER -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grizzly Hacks II</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div class="container">
-            <nav>
-                <div class="logo">GRIZZLY HACKS 22</div>    <!--temporary name-->>
-                <ul class="nav-links">
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
-                <button class="btn-enter">Enter</button>
-            </nav>
-        <h1 class="neo-title">HELLO WORLD</h1>
-        <div class="card">
-            <h1 id="test">TEST</h1>
-            <h1 id="pyRes">pyRes</h1>
+  <div class="container">
+    <nav>
+      <div class="logo">GRIZZLY HACKS 22</div>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+      <button class="btn-signup">Enter</button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-lines"></div>
+
+      <div class="hero-content">
+        <h1>Live Audio Transcriber</h1>
+        <p>Real-time, accessible text transcription for seamless group communication.</p>
+        <button class="btn-primary" id="start-btn">Initialize ASL Reader</button>
+      </div>
+
+      <div class="app-main-layout">
+        <div class="glass-card camera-container">
+            <div class="chat-header">ASL Camera Input</div>
+            <div class="camera-placeholder">
+                <video id="webcam" autoplay playsinline></video>
+                <div class="camera-overlay">Camera Active</div>
+            </div>
         </div>
-    </body>
-    <script src="script.js"></script>
+
+        <div class="glass-card transcript-container">
+            <div class="chat-header">Live Translation</div>
+            <div class="chat-body" id="transcript-box">
+                <div class="chat-message" id="output-text">Waiting for signs...</div>
+
+                <div class="backend-zone">
+                    <p>Backend Data:</p>
+                    <h1 id="test">TEST</h1>
+                    <h1 id="pyRes">pyRes</h1>
+                </div>
+            </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>

@@ -20,3 +20,15 @@ async function sendToPython() {
 }
 
 sendToPython();
+
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        const videoElement = document.getElementById('webcam');
+        videoElement.srcObject = stream;
+    } catch (err) {
+        console.error("Error accessing webcam: ", err);
+    }
+}
+
+document.querySelector('.btn-primary').addEventListener('click', startCamera);
