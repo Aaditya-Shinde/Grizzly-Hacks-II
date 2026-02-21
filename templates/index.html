@@ -37,7 +37,8 @@
                 <div class="glass-card camera-container">
                     <div class="chat-header">ASL Camera Input</div>
                     <div class="camera-placeholder">
-                        <video id="webcam" autoplay playsinline width="100%" height="100%"></video>
+                        <video class="camera" id="webcam" autoplay playsinline width="100%" height="100%"></video>
+                        <canvas class="camera" id="cam-display" width="100%" height="100%"></canvas>
                         <div class="camera-overlay">Camera Active</div>
                     </div>
                 </div>
@@ -46,19 +47,11 @@
                     <div class="chat-header">Live Translation</div>
                     <div class="chat-body" id="transcript-box">
                         <div class="chat-message" id="output-text">Waiting for signs...</div>
-
-                        <div class="backend-zone">
-                            <p>Backend Data:</p>
-                            <h1 id="test">TEST</h1>
-                            <h1 id="pyRes">pyRes</h1>
-                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
-
-    <canvas id="snapshot" width="640" height="480" style="display:none;"></canvas>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
