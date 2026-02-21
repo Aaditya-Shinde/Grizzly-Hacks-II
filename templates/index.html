@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
             <div class="hero-content">
                 <h1>Live Audio Transcriber</h1>
                 <p>Real-time, accessible text transcription for seamless group communication.</p>
-                <button class="btn-primary" id="start-btn" onclick="sendToPython()">Initialize ASL Reader</button>
+                <button class="btn-primary" id="start-btn">Initialize ASL Reader</button>
             </div>
 
             <div class="app-main-layout">
@@ -69,6 +69,6 @@
         </section>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script type="module" src="../static/script.js"></script>
 </body>
 </html>
