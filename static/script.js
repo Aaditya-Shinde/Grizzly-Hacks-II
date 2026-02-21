@@ -2,9 +2,18 @@ const video = document.getElementById('webcam');
 const canvas = document.getElementById('cam-display');
 const ctx = canvas.getContext('2d');
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => { video.srcObject = stream; })
-    .catch(err => console.error("Camera error: ", err));
+function startCamera() {
+    navigator.mediaDevices.getUserMedia({video:true})
+        .then(stream => {
+            video.srcObject = stream;
+            console.log("Camera successfully started.");
+            document.getElementById('start-btn').innerText = "Camera Active";
+            document.getElementById('start-btn').style.backgroundColor = "#28a745"
+        })
+        .catch(err => console.error("Camera error: ", err));
+}
+
+document.getElementById('start-btn').addEventListener('click', () => {startCamera();});
 
 async function sendToPython() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
