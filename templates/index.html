@@ -10,15 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+</head>do
 <body>
 
     <div class="container">
         <nav>
             <div class="logo">GRIZZLY HACKS 22</div>
             <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/history">History</a></li>
             </ul>
             <button class="btn-signup">Enter</button>
         </nav>
@@ -47,8 +47,25 @@
                     <div class="chat-header">Live Translation</div>
                     <div class="chat-body" id="transcript-box">
                         <div class="chat-message" id="output-text">Waiting for signs...</div>
+
+                        <div class="backend-zone">
+                            <p>Backend Data:</p>
+                            <h3 id="test">TEST</h3>
+                            <h3 id="pyRes">pyRes</h3>
+                        </div>
                     </div>
                 </div>
+
+                <div class="glass-card history-container">
+                    <div class="chat-header">Frequent Signs</div>
+                    <div class="chat-body" id="frequent-signs-box" style="height: 260px; overflow-y: auto;">
+                        <ul id="top-signs-list" style="list-style: none; padding: 0;">
+                            <li>Waiting for data...</li>
+                        </ul>
+                        <a href="/history" style="color: #4da8da; text-decoration: none; display: block; margin-top: 15px;">Show more history &rarr;</a>
+                    </div>
+                </div>
+
             </div>
         </section>
     </div>
