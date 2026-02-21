@@ -6,6 +6,11 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+#added this to open a new tab
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
 @app.route('/get_text', methods=['POST'])
 def get_text():
     data = request.get_json()
