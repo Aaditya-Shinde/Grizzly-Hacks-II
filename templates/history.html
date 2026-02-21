@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grizzly Hacks II - History</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="logo">GRIZZLY HACKS 22</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/history">History</a></li>
+            </ul>
+            <button class="btn-signup">Enter</button>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-lines"></div>
+
+            <div class="hero-content" style="margin-bottom: 2rem;">
+                <h1>Translation History</h1>
+                <p>Review all your frequently used ASL signs here.</p>
+            </div>
+
+            <div class="app-main-layout" style="display: block;">
+                
+                <div class="glass-card" style="max-width: 800px; margin: 0 auto; min-height: 50vh;">
+                    <div class="chat-header">Complete History Log</div>
+                    <div class="chat-body">
+                        
+                        <ul id="full-history-list" style="list-style: none; padding: 0; font-family: 'Space Mono', monospace; font-size: 1.1rem; line-height: 2;">
+                            <li style="color: #888;">No history found yet...</li> 
+                        </ul>
+                        
+                        <div style="margin-top: 30px; display: flex; gap: 15px;">
+                            <a href="/" class="btn-primary" style="text-decoration: none; display: inline-block; text-align: center;">&larr; Back to Camera</a>
+                            <button id="clear-history-btn" class="btn-primary" style="background-color: rgba(255, 77, 77, 0.2); border: 1px solid #ff4d4d; color: #ff4d4d;">Clear History</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
