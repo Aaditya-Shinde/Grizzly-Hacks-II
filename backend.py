@@ -8,18 +8,19 @@ def index():
 
 @app.route('/get_text', methods=['POST'])
 def get_text():
-    # Receive the JSON data from JS
     data = request.get_json()
     
-    # Extract the specific string
-    user_string = data.get('extracted_text')
+    # If data is None or 'extracted_text' is missing, default to empty string
+    user_string = data.get('extracted_text') if data else ""
     
-    # --- DO YOUR PYTHON LOGIC HERE ---
-    print(f"Python received: {user_string}")
-    processed_msg = f"Python successfully processed: {user_string.upper()}"
-    # ---------------------------------
+    if user_string is None:
+        user_string = ""
 
-    # Send a response back to the browser
+    print(f"Python received: '{user_string}'")
+    
+    # Now .upper() will work even if string is empty
+    processed_msg = f"Python successfully processed: {user_string.upper()}"
+    
     return jsonify({"status": "success", "message": processed_msg})
 
 if __name__ == '__main__':
