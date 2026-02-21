@@ -1,5 +1,5 @@
 const video = document.getElementById('webcam');
-const canvas = document.getElementById('snapshot');
+const canvas = document.getElementById('cam-display');
 const ctx = canvas.getContext('2d');
 
 function startCamera() {
@@ -24,7 +24,7 @@ async function sendToPython() {
     const response = await fetch('/get_text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "extracted_text": imageData })
+        body: JSON.stringify({ "image": imageData })
     });
 
     if (response.ok) {
@@ -34,3 +34,4 @@ async function sendToPython() {
         console.error("Server returned an error:", response.status);
     }
 }
+sendToPython();
