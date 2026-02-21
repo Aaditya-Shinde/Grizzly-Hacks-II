@@ -1,44 +1,271 @@
-:root {
-    --bg-color: #f4d738; /* Bright Yellow */
-    --accent: #ffffff;
-    --border-color: #000000;
+/* Base Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background-color: var(--bg-color);
-    font-family: "Arial Black", sans-serif; /* Bold typography is key */
+  background-color: #03040b; /* Very dark navy base */
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Container to hold the maximum width */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* --- Navigation --- */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #a0a4b8;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-family: 'Space Mono', monospace;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #ffffff;
+}
+
+.btn-signup {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 0.6rem 1.5rem;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.btn-signup:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Hero Section & Background Effects --- */
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 4rem 0 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The blue glow */
+.hero-glow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(17,65,219,0.4) 0%, rgba(3,4,11,0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* vertical curtain lines */
+.hero-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 100px
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: 3rem;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.hero p {
+  color: #a0a4b8;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+}
+
+.btn-primary {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 180px;
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+/* --- Transcriber Widget --- */
+.chat-widget-container {
+  position: relative;
+  z-index: 2;
+  margin-top: 4rem;
+  width: 100%;
+  max-width: 700px;
+  background: linear-gradient(180deg, rgba(0, 204, 255, 0.8) 0%, rgba(17, 65, 219, 0.2) 100%);
+  padding: 2px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 204, 255, 0.1);
+}
+
+.chat-widget {
+  background-color: #0b0d17;
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.chat-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: #00ccff;
+  margin-bottom: 1rem;
+}
+
+.chat-body {
+  background-color: #151828;
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  min-height: 200px;
+}
+
+.chat-message {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+/* Layout wrapper */
+.app-main-layout {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin-top: 2rem;
+    z-index: 2;
+}
+
+.glass-card {
+    flex: 1;
+    background-color: #0b0d17;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(180deg, rgba(0,204,255,0.6) 0%, rgba(17,65,219,0.1) 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.camera-container, .transcript-container {
+    background-color: #0b0d17;
+    padding: 1.5rem;
+    border-radius: 14px;
+}
+
+/* camera placeholder styling */
+.camera-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #151828;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    position: relative;
+    overflow: hidden;
 }
 
-/* The Card Styling */
-.card {
-    background: var(--accent);
-    border: 4px solid var(--border-color);
-    padding: 2rem;
-    max-width: 400px;
-    
-    /* The Signature Neo-Brutalist Shadow */
-    box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-    
-    transition: all 0.2s ease;
+#webcam {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* The Button Styling */
-.neo-button {
-    margin-top: 1rem;
-    padding: 10px 20px;
-    background: #ff90e8; /* Bright Pink */
-    border: 3px solid #000;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 4px 4px 0px 0px #000;
+.camera-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 204, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    font-family: 'Space Mono', monospace;
+    color: #00ccff;
+    border: 1px solid #00ccff;
 }
 
-/* Hover effect: The "Pressed" look */
-.neo-button:active {
-    box-shadow: 0px 0px 0px 0px #000;
-    transform: translate(4px, 4px);
+.backend-zone {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.backend-zone p {
+    font-size: 0.6rem;
+    color: #ff4757;
+    margin-bottom: 5px;
 }
