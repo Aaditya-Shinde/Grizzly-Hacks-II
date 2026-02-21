@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grizzly Hacks II</title>
+        <!-- CHANGE THIS LATER -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <video id="webcam" autoplay playsinline width="400" height="300"></video>
+
+        <canvas id="snapshot" width="400" height="300" style="display:none;"></canvas>
+        <h1 id="pyRes">pyRes</h1>
+
+        <button onclick="sendToPython()">Process Frame</button>
+    </body>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</html>
