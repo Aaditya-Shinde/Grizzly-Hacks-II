@@ -17,9 +17,9 @@
     <nav>
         <a href="index.html" class="logo">SIGNIFY</a>
         <ul class="nav-links">
-            <li><a href="app.html">Home</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="app.html">App</a></li>
             <li><a href="how-it-works.html">How It Works</a></li>
-            <li><a href="asl-reference.html" style="color: #fff;">ASL Reference</a></li>
             <li><a href="history.html">History</a></li>
         </ul>
         <a href="app.html" class="btn-launch">Try It →</a>
@@ -51,32 +51,32 @@
 
     <script>
         const ASL = [
-            { letter: 'A', emoji: '✊', desc: 'Closed fist with thumb resting on the side' },
-            { letter: 'B', emoji: '🖐️', desc: 'Flat hand, fingers together, thumb tucked across palm' },
-            { letter: 'C', emoji: '🤏', desc: 'Curved hand forming a C shape, fingers and thumb bent' },
-            { letter: 'D', emoji: '👆', desc: 'Index finger points up, other fingers curl to touch thumb' },
-            { letter: 'E', emoji: '🤛', desc: 'All fingers bent down, thumb tucked under fingers' },
-            { letter: 'F', emoji: '👌', desc: 'Index finger and thumb touch to form a circle, other fingers up' },
-            { letter: 'G', emoji: '👉', desc: 'Index finger and thumb point horizontally to the side' },
-            { letter: 'H', emoji: '✌️', desc: 'Index and middle fingers extended together, pointing sideways' },
-            { letter: 'I', emoji: '🤙', desc: 'Pinky finger extended upward, all other fingers closed' },
-            { letter: 'J', emoji: '🤙', desc: 'Pinky up, then trace a J shape in the air' },
-            { letter: 'K', emoji: '✌️', desc: 'Index and middle fingers up in a V, thumb between them' },
-            { letter: 'L', emoji: '🤙', desc: 'Thumb and index finger extend to form an L shape' },
-            { letter: 'M', emoji: '✊', desc: 'Three fingers (index, middle, ring) folded over tucked thumb' },
-            { letter: 'N', emoji: '✊', desc: 'Two fingers (index, middle) folded over tucked thumb' },
-            { letter: 'O', emoji: '👌', desc: 'All fingers curve to touch the thumb, forming an O shape' },
-            { letter: 'P', emoji: '👇', desc: 'Like K but pointed downward toward the floor' },
-            { letter: 'Q', emoji: '👇', desc: 'Like G but pointed downward toward the floor' },
-            { letter: 'R', emoji: '🤞', desc: 'Index and middle fingers crossed over each other' },
-            { letter: 'S', emoji: '✊', desc: 'Closed fist with thumb wrapped over the front of fingers' },
-            { letter: 'T', emoji: '✊', desc: 'Thumb tucked between index and middle fingers in a fist' },
-            { letter: 'U', emoji: '✌️', desc: 'Index and middle fingers extended straight up together' },
-            { letter: 'V', emoji: '✌️', desc: 'Index and middle fingers spread apart in a V shape' },
-            { letter: 'W', emoji: '🖖', desc: 'Index, middle, and ring fingers extended and spread apart' },
-            { letter: 'X', emoji: '☝️', desc: 'Index finger bent into a hook shape, like a crooked finger' },
-            { letter: 'Y', emoji: '🤙', desc: 'Thumb and pinky extended outward, middle fingers closed' },
-            { letter: 'Z', emoji: '☝️', desc: 'Index finger traces a Z shape in the air' },
+            { letter: 'A', desc: 'Closed fist with thumb resting on the side' },
+            { letter: 'B', desc: 'Flat hand, fingers together, thumb tucked across palm' },
+            { letter: 'C', desc: 'Curved hand forming a C shape, fingers and thumb bent' },
+            { letter: 'D', desc: 'Index finger points up, other fingers curl to touch thumb' },
+            { letter: 'E', desc: 'All fingers bent down, thumb tucked under fingers' },
+            { letter: 'F', desc: 'Index finger and thumb touch to form a circle, other fingers up' },
+            { letter: 'G', desc: 'Index finger and thumb point horizontally to the side' },
+            { letter: 'H', desc: 'Index and middle fingers extended together, pointing sideways' },
+            { letter: 'I', desc: 'Pinky finger extended upward, all other fingers closed' },
+            { letter: 'J', desc: 'Pinky up, then trace a J shape in the air' },
+            { letter: 'K', desc: 'Index and middle fingers up in a V, thumb between them' },
+            { letter: 'L', desc: 'Thumb and index finger extend to form an L shape' },
+            { letter: 'M', desc: 'Three fingers (index, middle, ring) folded over tucked thumb' },
+            { letter: 'N', desc: 'Two fingers (index, middle) folded over tucked thumb' },
+            { letter: 'O', desc: 'All fingers curve to touch the thumb, forming an O shape' },
+            { letter: 'P', desc: 'Like K but pointed downward toward the floor' },
+            { letter: 'Q', desc: 'Like G but pointed downward toward the floor' },
+            { letter: 'R', desc: 'Index and middle fingers crossed over each other' },
+            { letter: 'S', desc: 'Closed fist with thumb wrapped over the front of fingers' },
+            { letter: 'T', desc: 'Thumb tucked between index and middle fingers in a fist' },
+            { letter: 'U', desc: 'Index and middle fingers extended straight up together' },
+            { letter: 'V', desc: 'Index and middle fingers spread apart in a V shape' },
+            { letter: 'W', desc: 'Index, middle, and ring fingers extended and spread apart' },
+            { letter: 'X', desc: 'Index finger bent into a hook shape, like a crooked finger' },
+            { letter: 'Y', desc: 'Thumb and pinky extended outward, middle fingers closed' },
+            { letter: 'Z', desc: 'Index finger traces a Z shape in the air' },
         ];
 
         const grid = document.getElementById('alphabet-grid');
@@ -87,7 +87,6 @@
                 <div class="letter-card" style="--i:${i}">
                     <div class="letter-top">
                         <span class="letter-char">${item.letter}</span>
-                        <span class="letter-emoji">${item.emoji}</span>
                     </div>
                     <p class="letter-desc">${item.desc}</p>
                 </div>
