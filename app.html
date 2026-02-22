@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signify — ASL Live Transcriber</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ── Extra polish on top of style.css ── */
+
+        :root {
+            --cyan: #00ccff;
+            --purple: #bb88eb;
+            --bg-deep: #03040b;
+        }
+
+        /* Slim status pill */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,204,255,0.08);
+            border: 1px solid rgba(0,204,255,0.2);
+            border-radius: 30px;
+            padding: 5px 14px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--cyan);
+            margin-bottom: 1.2rem;
+            letter-spacing: 1px;
+        }
+        .status-pill .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.75); }
+        }
+
+        /* Mode toggle row */
+        .mode-toggle {
+            display: inline-flex;
+            gap: 0;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 0;
+        }
+        .mode-toggle .btn-primary {
+            border-radius: 5px;
+            padding: 0.65rem 1.5rem;
+            font-size: 0.8rem;
+            min-width: 140px;
+            transition: all 0.25s ease;
+        }
+        .mode-toggle .btn-primary.inactive {
+            background: transparent;
+            color: #606580;
+            border: none;
+            box-shadow: none;
+        }
+        .mode-toggle .btn-primary.inactive:hover {
+            color: #a0a4b8;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Main 3-col layout */
+        .app-main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 280px;
+            gap: 16px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 2rem;
+            z-index: 2;
+            align-items: start;
+        }
+
+        .glass-card {
+            background: linear-gradient(180deg, rgba(0,204,255,0.55) 0%, rgba(17,65,219,0.08) 100%);
+            border-radius: 16px;
+            padding: 2px;
+        }
+
+        .camera-container, .transcript-container, .signs-container {
+            background-color: #0b0d17;
+            padding: 1.4rem;
+            border-radius: 14px;
+            height: 100%;
+        }
+
+        /* section label */
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #3a3f5c;
+            margin-bottom: 0.5rem;
+        }
+
+        /* camera overlay badge */
+        .camera-overlay {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(0,204,255,0.15);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--cyan);
+            border: 1px solid rgba(0,204,255,0.4);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .camera-overlay::before {
+            content: '';
+            display: inline-block;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--cyan);
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        /* transcript area */
+        #output-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #c8d0e8;
+            min-height: 100px;
+            word-break: break-word;
+        }
+
+        /* word display */
+        #current-word-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 3px;
+            min-height: 2rem;
+            text-transform: lowercase;
+        }
+
+        /* top signs list */
+        #top-signs-list li {
+            padding: 8px 0;
+            color: var(--cyan);
+            font-family: 'Space Mono', monospace;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        #top-signs-list li span:last-child {
+            color: #a0a4b8;
+            font-size: 0.75rem;
+        }
+
+        .history-link {
+            color: var(--cyan);
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 14px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .history-link:hover { opacity: 1; }
+
+        /* hero h1 gradient */
+        .hero h1 span {
+            background: linear-gradient(90deg, #fff 0%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .app-main-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="logo" style="color: var(--purple, #bb88eb); letter-spacing: 1px;">SIGNIFY</div>
+            <ul class="nav-links">
+                <li><a href="index.html" style="color:#fff;">Home</a></li>
+                <li><a href="history.html">History</a></li>
+            </ul>
+            <button class="btn-signup">Enter</button>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-lines"></div>
+
+            <div class="hero-content">
+                <div class="status-pill"><span class="dot"></span> LIVE TRANSCRIPTION</div>
+                <h1><span>ASL &amp; Speech</span><br>Transcriber</h1>
+                <p>Real-time accessible text transcription for seamless communication — sign or speak, we translate.</p>
+
+                <div class="mode-toggle">
+                    <button class="btn-primary" id="sign-to-text-btn">✋ Sign to Text</button>
+                    <button class="btn-primary inactive" id="speech-to-text-btn">🎙 Speech to Text</button>
+                </div>
+            </div>
+
+            <!-- 3-column app layout -->
+            <div class="app-main-layout">
+
+                <!-- Column 1: Camera -->
+                <div class="glass-card">
+                    <div class="camera-container">
+                        <div class="section-label">ASL Camera Input</div>
+                        <div class="camera-placeholder">
+                            <video class="camera" id="webcam" autoplay playsinline></video>
+                            <canvas class="camera" id="cam-display"></canvas>
+                            <div class="camera-overlay">Camera Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Live Transcript -->
+                <div class="glass-card">
+                    <div class="transcript-container">
+                        <div class="section-label">Live Translation</div>
+                        <div class="chat-body">
+                            <div class="word-builder">
+                                <span id="current-word-display" title="Hold sign for 500ms to commit">—</span>
+                                <button id="clear-word-btn">Clear</button>
+                            </div>
+                            <div class="chat-message" id="output-text">Waiting for signs...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Frequent Signs -->
+                <div class="glass-card">
+                    <div class="signs-container">
+                        <div class="section-label">Frequent Signs</div>
+                        <ul id="top-signs-list" style="list-style:none; padding:0;">
+                            <li><span style="color:#555;">Waiting for data...</span><span></span></li>
+                        </ul>
+                        <a href="history.html" class="history-link">View full history &rarr;</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="script.js"></script>
+
+    <script>
+        // Toggle active style between the two mode buttons
+        const signBtn   = document.getElementById('sign-to-text-btn');
+        const speechBtn = document.getElementById('speech-to-text-btn');
+
+        function setActive(activeBtn, inactiveBtn) {
+            activeBtn.classList.remove('inactive');
+            inactiveBtn.classList.add('inactive');
+        }
+
+        signBtn.addEventListener('click',   () => setActive(signBtn, speechBtn));
+        speechBtn.addEventListener('click', () => setActive(speechBtn, signBtn));
+    </script>
+</body>
+</html>
