@@ -5,7 +5,6 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 
 const video              = document.getElementById("webcam");
-const init_btn = document.getElementById("start-btn");
 const canvasElement      = document.getElementById("cam-display");
 const canvasCtx          = canvasElement.getContext("2d");
 const outputText         = document.getElementById("output-text");
@@ -331,17 +330,4 @@ async function predictWebcam() {
 
 //#endregion
 
-init_btn.addEventListener('click', init);
-
-document.getElementById('stop-btn').addEventListener('click', () => {
-    cameraRunning = false;
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.srcObject = null;
-    }
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    voteBuffer  = [];
-    holdingWord = null;
-    holdStart   = null;
-    updateDisplay(null);
-});
+init();
