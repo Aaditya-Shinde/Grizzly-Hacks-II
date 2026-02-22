@@ -17,6 +17,7 @@ const speechBtn       = document.getElementById("speech-to-text-btn");
 let gestureRecognizer;
 let SpeechRecognition;
 let recognition;
+let requestId;
 let lastVideoTime = -1;
 let cameraRunning = false;
 
@@ -265,6 +266,7 @@ async function init() {
     speechBtn.addEventListener('click', () => {
         handlerType = 'speech';
         console.log(handlerType);
+        window.cancelAnimationFrame(requestId);
         recognition.start();
     });
 
@@ -368,7 +370,7 @@ async function predictWebcam() {
             updateDisplay(null);
         }
     }
-    window.requestAnimationFrame(predictWebcam);
+    requestId = window.requestAnimationFrame(predictWebcam);
 }
 
 async function predictSpeech(event){
@@ -392,7 +394,6 @@ async function handler(event){
 
         predictSpeech(event);
     } else if (handlerType == 'sign'){
-
         predictWebcam();
     }
 }
