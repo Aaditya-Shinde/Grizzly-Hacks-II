@@ -58,16 +58,6 @@
         const list    = document.getElementById('full-history-list');
         const clearBtn = document.getElementById('clear-history-btn');
 
-        // Words with locally hosted sign videos
-        const SIGN_VIDEOS = {
-            'callonphone': 'phone', 'fine': 'find',
-        };
-
-        function signVideoPath(word) {
-            const key = SIGN_VIDEOS[word] || word;
-            return `public/signs/words/${key}.mp4`;
-        }
-
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('signify_history') || '[]');
             if (history.length === 0) {
@@ -79,14 +69,9 @@
                 .reverse()
                 .map(entry => {
                     const date = new Date(entry.time).toLocaleTimeString();
-                    const src  = signVideoPath(entry.word);
                     return `<li style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-                                       display: flex; align-items: center; gap: 14px;">
-                                <video src="${src}" autoplay muted loop playsinline
-                                       style="height: 70px; width: auto; border-radius: 8px;
-                                              background: #1a1d2e; flex-shrink: 0;"
-                                       onerror="this.style.display='none'"></video>
-                                <span style="color: #00ccff; flex: 1;">${entry.word}</span>
+                                       display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #00ccff;">${entry.word}</span>
                                 <span style="color: #555; font-size: 0.75rem;">${date}</span>
                             </li>`;
                 })
