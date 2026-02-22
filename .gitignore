@@ -6,4 +6,3 @@ dist/
 *.jpg
 *.jpeg
 .gitignore
-asl-signs/train_landmark_files

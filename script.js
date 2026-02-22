@@ -293,7 +293,7 @@ async function init() {
 
 //#region ─── Prediction loop ──────────────────────────────────────────────────────────
 async function predictWebcam() {
-    if (!cameraRunning) return;
+    if (!cameraRunning || handlerType != 'sign') return;
 
     canvasElement.width  = video.videoWidth;
     canvasElement.height = video.videoHeight;
@@ -368,7 +368,6 @@ async function predictWebcam() {
             updateDisplay(null);
         }
     }
-
     window.requestAnimationFrame(predictWebcam);
 }
 
