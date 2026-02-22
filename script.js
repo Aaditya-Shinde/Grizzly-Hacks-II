@@ -375,6 +375,26 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
 }
 
+async function predictSpeech(){
+    let finalTranscript = '';
+    let interimTranscript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+        } else {
+            interimTranscript += event.results[i][0].transcript;
+        }
+    }
+
+    // output.innerHTML = `<strong>${finalTranscript}</strong> <span style="color: #999">${interimTranscript}</span>`;
+    console.log(interimTranscript);
+}
+
+async function handler(){
+    
+}
+
 //#endregion
 
 init();
