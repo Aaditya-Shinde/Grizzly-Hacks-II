@@ -26,6 +26,7 @@ let holdingLetter = null;
 let holdStart     = null;
 let lastCommit    = 0;
 let lastHandSeen  = Date.now();
+let clearCooldown = false;
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
@@ -58,7 +59,7 @@ function fromWrist(p) {
 }
 
 // Finger tip is extended if it's further from wrist than its PIP joint
-function extended(tip, pip, threshold = 1.6) {
+function extended(tip, pip, threshold = 1.2) {
     return fromWrist(tip) > fromWrist(pip) * threshold;
 }
 
@@ -237,6 +238,7 @@ function getVotedLetter(buffer) {
 }
 
 function commitLetter(letter) {
+    if (clearCooldown) return;
     const now = Date.now();
     if (now - lastCommit < COOLDOWN_MS) return;
     lastCommit    = now;
@@ -366,6 +368,8 @@ clearWordBtn.addEventListener('click', () => {
     holdingLetter = null;
     holdStart     = null;
     voteBuffer    = [];
+    clearCooldown = true;
+    setTimeout(() => { clearCooldown = false; }, 2500);
     updateDisplay();
 });
 
