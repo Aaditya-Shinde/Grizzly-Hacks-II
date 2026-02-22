@@ -14,6 +14,7 @@ const currentWordDisplay = document.getElementById("current-word-display");
 const clearWordBtn       = document.getElementById("clear-word-btn");
 
 let gestureRecognizer;
+let SpeechRecognition;
 let lastVideoTime = -1;
 
 // ─── Word / sentence state ────────────────────────────────────────────────────
@@ -22,10 +23,10 @@ let wordCounts   = JSON.parse(localStorage.getItem('signify_wordCounts') || '{}'
 let wordHistory  = JSON.parse(localStorage.getItem('signify_history')    || '[]');
 
 let voteBuffer   = [];
-let holdingWord  = null;
-let holdStart    = null;
-let lastCommit   = 0;
-let lastHandSeen = Date.now();
+var holdingWord;
+var holdStart;
+var lastCommit = 0;
+var prevWord = "";
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
@@ -129,9 +130,9 @@ function classifyWord(rawLandmarks) {
             // Pure closed fist (no fingers or thumb extended)
             const ixOver = lm[8][1]  > lm[4][1];
             const mdOver = lm[12][1] > lm[4][1];
-            if (ixOver && mdOver) return 'finish';    // M/N wrap = finish/done
+            if (ixOver && mdOver) return 'period';    // M/N wrap = period/done
             if (fromWrist(lm[8]) < 0.8) return 'no'; // fingers very curled = no
-            return 'finish';
+            return 'period';
         }
         // Thumb out
         if (thumbHoriz(lm)) return 'yes';            // A-shape with thumb = yes
@@ -150,7 +151,7 @@ function classifyWord(rawLandmarks) {
 const GESTURE_MAP = {
     'Thumb_Up':    'yes',     // thumbs up ≈ yes
     'Thumb_Down':  'no',      // thumbs down ≈ no
-    'Closed_Fist': 'finish',  // closed fist ≈ finish / done
+    'Closed_Fist': 'period',  // closed fist ≈ period / done
     'Open_Palm':   'hello',   // open palm ≈ hello
     'Pointing_Up': 'up',      // index up ≈ up
     'Victory':     'no',      // V-shape ≈ no (two-finger wag)
@@ -195,10 +196,15 @@ function getVotedWord(buffer) {
 
 function commitWord(word) {
     const now = Date.now();
-    if (now - lastCommit < COOLDOWN_MS) return;
+    if (now - lastCommit < COOLDOWN_MS 
+        || word == prevWord){ 
+        return;
+    }
+
     lastCommit   = now;
-    lastHandSeen = now;
-    sentence     = sentence ? sentence + ' ' + word : word;
+    prevWord = word;
+
+    sentence += (sentence && word != '.') ? ' ' + word : word;
     wordCounts[word] = (wordCounts[word] || 0) + 1;
     localStorage.setItem('signify_wordCounts', JSON.stringify(wordCounts));
     wordHistory.push({ word, time: Date.now() });
@@ -217,6 +223,45 @@ function startWebcam() {
         video.srcObject = stream;
         video.addEventListener("loadeddata", predictWebcam);
     });
+}
+
+function startAudio(){
+    let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        console.log("Sorry, your browser does not support the Web Speech API. Try Chrome or Safari.");
+    } else {
+        const recognition = new SpeechRecognition();
+        
+        // Configuration
+        recognition.continuous = true; // Keep listening even if user pauses
+        recognition.interimResults = true; // Show results as you speak
+        recognition.lang = 'en-US';
+
+        recognition.start();
+
+        // stopBtn.addEventListener('click', () => {
+        //     recognition.stop();
+        //     startBtn.disabled = false;
+        //     stopBtn.disabled = true;
+        //     status.innerText = "Status: Stopped";
+        // });
+
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            // output.innerHTML = `<strong>${finalTranscript}</strong> <span style="color: #999">${interimTranscript}</span>`;
+            console.log(interimTranscript);
+        };
+    }
 }
 
 async function init() {
@@ -244,9 +289,9 @@ async function init() {
         runningMode: "LIVE_STREAM",
         numHands: 2
     });
-
-    startWebcam();
     
+    startAudio();
+    startWebcam();
 }
 //#endregion
 
@@ -265,7 +310,6 @@ async function predictWebcam() {
         const drawingUtils = new DrawingUtils(canvasCtx);
 
         if (results.landmarks && results.landmarks.length > 0) {
-            lastHandSeen = nowInMs;
 
             // Draw skeleton
             for (const landmarks of results.landmarks) {
@@ -296,14 +340,18 @@ async function predictWebcam() {
                 const voted = getVotedWord(voteBuffer);
 
                 if (voted) {
-                    // Show currently detected word while holding
-                    updateDisplay(voted);
-
-                    if (holdingWord !== voted) {
-                        holdingWord = voted;
-                        holdStart   = nowInMs;
-                    } else if (nowInMs - holdStart >= HOLD_MS) {
-                        commitWord(voted);
+                    if (voted == "period"){
+                        commitWord(".");
+                    } else {
+                        // Show currently detected word while holding
+                        updateDisplay(voted);
+    
+                        if (holdingWord !== voted) {
+                            holdingWord = voted;
+                            holdStart   = nowInMs;
+                        } else if (nowInMs - holdStart >= HOLD_MS) {
+                            commitWord(voted);
+                        }
                     }
                 }
             } else {
