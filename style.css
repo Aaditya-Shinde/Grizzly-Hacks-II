@@ -257,11 +257,12 @@ nav {
 
 #current-word-display {
     font-family: 'Space Mono', monospace;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #00ccff;
-    letter-spacing: 6px;
+    letter-spacing: 2px;
     min-height: 2.5rem;
+    text-transform: lowercase;
 }
 
 #clear-word-btn {
