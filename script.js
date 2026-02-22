@@ -11,11 +11,10 @@ const outputText         = document.getElementById("output-text");
 const topSignsList       = document.getElementById("top-signs-list");
 const currentWordDisplay = document.getElementById("current-word-display");
 const clearWordBtn       = document.getElementById("clear-word-btn");
-const signBtn       = document.getElementById("sign-to-text-btn");
-const speechBtn       = document.getElementById("speech-to-text-btn");
+const signBtn            = document.getElementById("sign-to-text-btn");
+const speechBtn          = document.getElementById("speech-to-text-btn");
 
 let gestureRecognizer;
-let SpeechRecognition;
 let recognition;
 let lastVideoTime = -1;
 let cameraRunning = false;
@@ -30,7 +29,9 @@ var holdingWord;
 var holdStart;
 var lastCommit = 0;
 var prevWord = "";
-var handlerType = 'speech';
+
+// FIX 1: default to 'sign' so the webcam loop starts immediately on load
+var handlerType = 'sign';
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
@@ -64,104 +65,70 @@ function thumbHoriz(lm) {
 //#endregion
 
 //#region ─── ASL Word Classifier ──────────────────────────────────────────────────────
-// Maps hand landmark geometry to words from the downloaded ASL Signs dataset.
-// Covers signs with recognisable static handshapes; motion-based signs return null.
 function classifyWord(rawLandmarks) {
     const lm = normalizeLandmarks(rawLandmarks);
 
-    const TH = extended(lm[4],  lm[3]);   // thumb
-    const IX = extended(lm[8],  lm[6]);   // index
-    const MD = extended(lm[12], lm[10]);  // middle
-    const RN = extended(lm[16], lm[14]);  // ring
-    const PK = extended(lm[20], lm[18]);  // pinky
+    const TH = extended(lm[4],  lm[3]);
+    const IX = extended(lm[8],  lm[6]);
+    const MD = extended(lm[12], lm[10]);
+    const RN = extended(lm[16], lm[14]);
+    const PK = extended(lm[20], lm[18]);
 
     const thumbToIndex   = d(lm[4], lm[8]);
     const thumbToMiddle  = d(lm[4], lm[12]);
     const indexToMiddle  = d(lm[8], lm[12]);
     const thumbToIdxBase = d(lm[4], lm[5]);
 
-    // ── All four fingers, open flat (B shape) ──────────────────────────────
-    // hello, bye, please, stop, thankyou all use a flat open B hand
     if (!TH && IX && MD && RN && PK) {
-        if (thumbToIndex < 0.5) return 'please';    // thumb tucked = please
-        return 'hello';                             // open flat = hello / bye
+        if (thumbToIndex < 0.5) return 'please';
+        return 'hello';
     }
-
-    // ── Three middle fingers (W shape) → water ────────────────────────────
     if (!TH && IX && MD && RN && !PK) return 'water';
-
-    // ── Two fingers (index + middle) ──────────────────────────────────────
     if (!TH && IX && MD && !RN && !PK) {
-        if (indexToMiddle < 0.25) return 'see';    // crossed = see (V at eyes)
-        if (indexToMiddle >= 0.5) return 'no';     // spread apart = no
-        return 'look';                             // together = look
+        if (indexToMiddle < 0.25) return 'see';
+        if (indexToMiddle >= 0.5) return 'no';
+        return 'look';
     }
-
-    // ── Index + pinky (claw, no middle/ring) ──────────────────────────────
     if (!TH && IX && !MD && !RN && PK) return 'callonphone';
-
-    // ── Thumb + pinky (Y / shaka shape) → callonphone ─────────────────────
     if (TH && !IX && !MD && !RN && PK) return 'callonphone';
-
-    // ── ILY (thumb + index + pinky) → I love you ─────────────────────────
-    if (TH && IX && !MD && !RN && PK) return 'yes';  // closest static match
-
-    // ── Only index up → up ───────────────────────────────────────────────
+    if (TH && IX && !MD && !RN && PK) return 'yes';
     if (!TH && IX && !MD && !RN && !PK) return 'up';
-
-    // ── Only pinky up → quiet ─────────────────────────────────────────────
     if (!TH && !IX && !MD && !RN && PK) return 'quiet';
-
-    // ── Thumb + index + middle (3 on one side) → drink ───────────────────
     if (TH && IX && MD && !RN && !PK) return 'drink';
-
-    // ── Thumb + index (L shape) → like / look ────────────────────────────
     if (TH && IX && !MD && !RN && !PK) {
-        if (thumbHoriz(lm)) return 'like';          // L-shape = like
+        if (thumbHoriz(lm)) return 'like';
         return 'find';
     }
-
-    // ── All five extended → open ──────────────────────────────────────────
     if (TH && IX && MD && RN && PK) return 'open';
-
-    // ── F shape (middle+ring+pinky up, index+thumb circle) ───────────────
     if (!TH && !IX && MD && RN && PK && thumbToIndex < 0.6) return 'fine';
-
-    // ── Closed fist family ────────────────────────────────────────────────
     if (!IX && !MD && !RN && !PK) {
         if (!TH) {
-            // Pure closed fist (no fingers or thumb extended)
             const ixOver = lm[8][1]  > lm[4][1];
             const mdOver = lm[12][1] > lm[4][1];
-            if (ixOver && mdOver) return 'period';    // M/N wrap = period/done
-            if (fromWrist(lm[8]) < 0.8) return 'no'; // fingers very curled = no
+            if (ixOver && mdOver) return 'period';
+            if (fromWrist(lm[8]) < 0.8) return 'no';
             return 'period';
         }
-        // Thumb out
-        if (thumbHoriz(lm)) return 'yes';            // A-shape with thumb = yes
-        if (thumbToIdxBase < 0.7) return 'think';    // thumb between fingers = think
-        if (thumbToIndex < 1.0) return 'yes';        // thumb wrapped = yes
+        if (thumbHoriz(lm)) return 'yes';
+        if (thumbToIdxBase < 0.7) return 'think';
+        if (thumbToIndex < 1.0) return 'yes';
         return 'yes';
     }
-
     return null;
 }
-
 //#endregion
 
 //#region ─── MediaPipe gesture → ASL word mapping ─────────────────────────────────────
-// Primary classifier — runs before geometric fallback.
 const GESTURE_MAP = {
-    'Thumb_Up':    'yes',     // thumbs up ≈ yes
-    'Thumb_Down':  'no',      // thumbs down ≈ no
-    'Closed_Fist': 'period',  // closed fist ≈ period / done
-    'Open_Palm':   'hello',   // open palm ≈ hello
-    'Pointing_Up': 'up',      // index up ≈ up
-    'Victory':     'no',      // V-shape ≈ no (two-finger wag)
-    'ILoveYou':    'I love you',     // ILY shape
+    'Thumb_Up':    'yes',
+    'Thumb_Down':  'no',
+    'Closed_Fist': 'period',
+    'Open_Palm':   'hello',
+    'Pointing_Up': 'up',
+    'Victory':     'no',
+    'ILoveYou':    'I love you',
 };
 
-// ─── Display helpers ──────────────────────────────────────────────────────────
 function updateDisplay(detected) {
     currentWordDisplay.textContent = detected || '—';
     outputText.textContent = sentence || 'Waiting for signs...';
@@ -199,13 +166,10 @@ function getVotedWord(buffer) {
 
 function commitWord(word) {
     const now = Date.now();
-    if (now - lastCommit < COOLDOWN_MS 
-        || word == prevWord){ 
-        return;
-    }
+    if (now - lastCommit < COOLDOWN_MS || word == prevWord) return;
 
-    lastCommit   = now;
-    prevWord = word;
+    lastCommit = now;
+    prevWord   = word;
 
     sentence += (sentence && word != '.') ? ' ' + word : word;
     wordCounts[word] = (wordCounts[word] || 0) + 1;
@@ -217,7 +181,6 @@ function commitWord(word) {
     updateDisplay(null);
     updateTopSigns();
 }
-
 //#endregion
 
 //#region ─── Init ─────────────────────────────────────────────────────────────────────
@@ -225,49 +188,47 @@ function startWebcam() {
     cameraRunning = true;
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
-        video.addEventListener("loadeddata", handler);
+        // FIX 2: always kick off the webcam prediction loop directly,
+        // regardless of handlerType
+        video.addEventListener("loadeddata", predictWebcam);
     });
 }
 
-function startAudio(){
-    let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+function startAudio() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        document.getElementById('output').innerText = "Sorry, your browser does not support the Web Speech API. Try Chrome.";
-    } else {
-        recognition = new SpeechRecognition();
-        
-        // Configuration
-        recognition.continuous = true; // Keep listening even if user pauses
-        recognition.interimResults = true; // Show results as you speak
-        recognition.lang = 'en-US';
-
-        recognition.onresult = handler;
+        console.warn("Web Speech API not supported in this browser.");
+        return;
     }
+    recognition = new SpeechRecognition();
+    recognition.continuous     = true;
+    recognition.interimResults = true;
+    recognition.lang           = 'en-US';
+    recognition.onresult       = predictSpeech;
 }
 
 async function init() {
     clearWordBtn.addEventListener('click', () => {
-        sentence      = '';
-        holdingWord   = null;
-        holdStart     = null;
-        voteBuffer    = [];
+        sentence    = '';
+        holdingWord = null;
+        holdStart   = null;
+        voteBuffer  = [];
         updateDisplay(null);
         outputText.textContent = 'Waiting for signs...';
     });
 
     signBtn.addEventListener('click', () => {
-        sentence = '';
+        sentence    = '';
         handlerType = 'sign';
-        console.log(handlerType);
-        recognition.stop();
+        // Stop mic, restart webcam loop in case it stalled
+        if (recognition) recognition.stop();
+        predictWebcam();
     });
 
     speechBtn.addEventListener('click', () => {
         handlerType = 'speech';
-        console.log(handlerType);
-        recognition.start();
+        if (recognition) recognition.start();
     });
-
 
     updateDisplay(null);
     updateTopSigns();
@@ -284,16 +245,22 @@ async function init() {
         runningMode: "LIVE_STREAM",
         numHands: 2
     });
-    
+
     startAudio();
     startWebcam();
-    recognition.start();
+    // FIX 3: do NOT auto-start recognition — default mode is sign, not speech
 }
 //#endregion
 
 //#region ─── Prediction loop ──────────────────────────────────────────────────────────
 async function predictWebcam() {
-    if (!cameraRunning || handlerType != 'sign') return;
+    // FIX 4: guard against running when in speech mode, but don't kill the
+    // loop permanently — reschedule so switching back to sign works instantly
+    if (!cameraRunning) return;
+    if (handlerType !== 'sign') {
+        window.requestAnimationFrame(predictWebcam);
+        return;
+    }
 
     canvasElement.width  = video.videoWidth;
     canvasElement.height = video.videoHeight;
@@ -308,8 +275,6 @@ async function predictWebcam() {
         const drawingUtils = new DrawingUtils(canvasCtx);
 
         if (results.landmarks && results.landmarks.length > 0) {
-
-            // Draw skeleton
             for (const landmarks of results.landmarks) {
                 drawingUtils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
                     color: "#00ccff",
@@ -318,14 +283,12 @@ async function predictWebcam() {
                 drawingUtils.drawLandmarks(landmarks, { color: "#ffffff", lineWidth: 1 });
             }
 
-            // 1. MediaPipe gesture recognizer (primary)
             let word = null;
             if (results.gestures.length > 0) {
                 const gestureLabel = results.gestures[0][0].categoryName;
                 word = GESTURE_MAP[gestureLabel] || null;
             }
 
-            // 2. Geometric word classifier (fallback)
             if (!word && results.landmarks.length > 0) {
                 const rawLandmarks = results.landmarks[0].map(lm => [lm.x, lm.y, lm.z]);
                 word = classifyWord(rawLandmarks);
@@ -336,15 +299,12 @@ async function predictWebcam() {
                 if (voteBuffer.length > VOTE_WINDOW) voteBuffer.shift();
 
                 const voted = getVotedWord(voteBuffer);
-
                 if (voted) {
-                    if (voted == "period"){
+                    if (voted === "period") {
                         updateDisplay("period");
                         commitWord(".");
                     } else {
-                        // Show currently detected word while holding
                         updateDisplay(voted);
-    
                         if (holdingWord !== voted) {
                             holdingWord = voted;
                             holdStart   = nowInMs;
@@ -361,19 +321,18 @@ async function predictWebcam() {
             }
 
         } else {
-            // No hand detected
             voteBuffer  = [];
             holdingWord = null;
             holdStart   = null;
             updateDisplay(null);
         }
     }
+
     window.requestAnimationFrame(predictWebcam);
 }
 
-async function predictSpeech(event){
+async function predictSpeech(event) {
     let interimTranscript = '';
-
     for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
             sentence += '.';
@@ -382,21 +341,8 @@ async function predictSpeech(event){
             sentence = interimTranscript;
         }
     }
-    
     updateDisplay("Speech Detection");
 }
-
-async function handler(event){
-    console.log(handlerType);
-    if (handlerType == 'speech'){
-
-        predictSpeech(event);
-    } else if (handlerType == 'sign'){
-
-        predictWebcam();
-    }
-}
-
 //#endregion
 
 init();
