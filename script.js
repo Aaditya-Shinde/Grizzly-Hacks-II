@@ -133,6 +133,19 @@ function startAudio() {
     recognition.interimResults = true;
     recognition.lang           = 'en-US';
     recognition.onresult       = predictSpeech;
+    recognition.onerror        = (e) => {
+        if (e.error === 'not-allowed') {
+            currentWordDisplay.textContent = 'Mic blocked';
+            outputText.textContent = 'Microphone access was denied. Click the 🔒 in your address bar to allow it.';
+        }
+    };
+    recognition.onend = () => {
+        if (handlerType === 'speech') {
+            setTimeout(() => {
+                try { recognition.start(); } catch (_) {}
+            }, 300);
+        }
+    };
 }
 
 async function init() {
@@ -148,18 +161,25 @@ async function init() {
     signBtn.addEventListener('click', () => {
         sentence    = '';
         handlerType = 'sign';
-        // Stop mic, restart webcam loop in case it stalled
-        if (recognition) recognition.stop();
+        if (recognition) try { recognition.stop(); } catch (_) {}
+        updateDisplay(null);
+        outputText.textContent = 'Waiting for signs...';
         predictWebcam();
     });
 
     speechBtn.addEventListener('click', () => {
+        sentence    = '';
         handlerType = 'speech';
-        if (recognition) recognition.start();
+        currentWordDisplay.textContent = '🎙 Listening...';
+        outputText.textContent = 'Start speaking...';
+        if (recognition) {
+            try { recognition.start(); } catch (_) { /* already running is fine */ }
+        }
     });
 
     updateDisplay(null);
     updateTopSigns();
+    startAudio();
 
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
@@ -174,9 +194,7 @@ async function init() {
         numHands: 2
     });
 
-    startAudio();
     startWebcam();
-    // FIX 3: do NOT auto-start recognition — default mode is sign, not speech
 }
 //#endregion
 
@@ -249,17 +267,17 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
 }
 
-async function predictSpeech(event) {
+function predictSpeech(event) {
     let interimTranscript = '';
     for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-            sentence += '.';
+            sentence += event.results[i][0].transcript + ' ';
         } else {
             interimTranscript += event.results[i][0].transcript;
-            sentence = interimTranscript;
         }
     }
-    updateDisplay("Speech Detection");
+    currentWordDisplay.textContent = 'Listening...';
+    outputText.textContent = (sentence + interimTranscript) || 'Listening...';
 }
 //#endregion
 
