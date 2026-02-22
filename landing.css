@@ -143,6 +143,7 @@ body {
 .btn-enter {
     opacity: 0;
     animation: fadeUp 0.9s 0.65s ease forwards;
+    margin-top: 1rem;
     display: inline-flex;
     align-items: center;
     gap: 10px;
