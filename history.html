@@ -54,6 +54,37 @@
         </section>
     </div>
 
-    <link rel="stylesheet" href="script.js">
+    <script>
+        const list    = document.getElementById('full-history-list');
+        const clearBtn = document.getElementById('clear-history-btn');
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('signify_history') || '[]');
+            if (history.length === 0) {
+                list.innerHTML = '<li style="color: #888;">No history found yet...</li>';
+                return;
+            }
+            list.innerHTML = history
+                .slice()
+                .reverse()
+                .map(entry => {
+                    const date = new Date(entry.time).toLocaleTimeString();
+                    return `<li style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+                                       display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #00ccff;">${entry.word}</span>
+                                <span style="color: #555; font-size: 0.75rem;">${date}</span>
+                            </li>`;
+                })
+                .join('');
+        }
+
+        clearBtn.addEventListener('click', () => {
+            localStorage.removeItem('signify_history');
+            localStorage.removeItem('signify_letterCounts');
+            loadHistory();
+        });
+
+        loadHistory();
+    </script>
 </body>
 </html>
