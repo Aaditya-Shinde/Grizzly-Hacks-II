@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Speech to Text</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f4f4f9; }
+        #container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 80%; max-width: 500px; text-align: center; }
+        #output { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; min-height: 100px; text-align: left; background: #fafafa; border-radius: 8px; line-height: 1.5; }
+        .controls { display: flex; gap: 10px; justify-content: center; }
+        button { padding: 10px 20px; font-size: 1rem; cursor: pointer; border: none; border-radius: 5px; transition: 0.3s; }
+        #start { background-color: #28a745; color: white; }
+        #stop { background-color: #dc3545; color: white; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .status { font-size: 0.8rem; color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Speech to Text</h2>
+    <div id="output">Click "Start Listening" and say something...</div>
+    
+    <div class="controls">
+        <button id="start">Start Listening</button>
+        <button id="stop" disabled>Stop</button>
+    </div>
+    
+    <p class="status" id="status">Status: Idle</p>
+</div>
+
+<script>
+    // 1. Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        document.getElementById('output').innerText = "Sorry, your browser does not support the Web Speech API. Try Chrome.";
+    } else {
+        const recognition = new SpeechRecognition();
+        
+        // Configuration
+        recognition.continuous = true; // Keep listening even if user pauses
+        recognition.interimResults = true; // Show results as you speak
+        recognition.lang = 'en-US';
+
+        const startBtn = document.getElementById('start');
+        const stopBtn = document.getElementById('stop');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+
+        // 2. Start Recognition
+        startBtn.addEventListener('click', () => {
+            recognition.start();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            status.innerText = "Status: Listening...";
+            output.innerText = ""; // Clear previous text
+        });
+
+        // 3. Stop Recognition
+        stopBtn.addEventListener('click', () => {
+            recognition.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            status.innerText = "Status: Stopped";
+        });
+
+        // 4. Handle Results
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            // Display the text (interim text is usually styled differently)
+            output.innerHTML = `<strong>${finalTranscript}</strong> <span style="color: #999">${interimTranscript}</span>`;
+        };
+
+        // Handle Errors
+        recognition.onerror = (event) => {
+            status.innerText = "Error occurred: " + event.error;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        };
+    }
+</script>
+
+</body>
+</html>
