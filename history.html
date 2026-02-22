@@ -58,9 +58,14 @@
         const list    = document.getElementById('full-history-list');
         const clearBtn = document.getElementById('clear-history-btn');
 
-        function signUrl(word) {
-            const w = word.toLowerCase().replace(/\s+/g, '-');
-            return `https://www.handspeak.com/word/${w[0]}/${w.slice(0, 3)}/${w}.mp4`;
+        // Words with locally hosted sign videos
+        const SIGN_VIDEOS = {
+            'callonphone': 'phone', 'fine': 'find',
+        };
+
+        function signVideoPath(word) {
+            const key = SIGN_VIDEOS[word] || word;
+            return `public/signs/words/${key}.mp4`;
         }
 
         function loadHistory() {
@@ -74,10 +79,10 @@
                 .reverse()
                 .map(entry => {
                     const date = new Date(entry.time).toLocaleTimeString();
-                    const url  = signUrl(entry.word);
+                    const src  = signVideoPath(entry.word);
                     return `<li style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
                                        display: flex; align-items: center; gap: 14px;">
-                                <video src="${url}" autoplay muted loop playsinline
+                                <video src="${src}" autoplay muted loop playsinline
                                        style="height: 70px; width: auto; border-radius: 8px;
                                               background: #1a1d2e; flex-shrink: 0;"
                                        onerror="this.style.display='none'"></video>
