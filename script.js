@@ -15,6 +15,7 @@ const clearWordBtn       = document.getElementById("clear-word-btn");
 
 let gestureRecognizer;
 let lastVideoTime = -1;
+let cameraRunning = false;
 
 // ─── Word / sentence state ────────────────────────────────────────────────────
 let sentence     = '';
@@ -213,6 +214,7 @@ function commitWord(word) {
 
 //#region ─── Init ─────────────────────────────────────────────────────────────────────
 function startWebcam() {
+    cameraRunning = true;
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
         video.addEventListener("loadeddata", predictWebcam);
@@ -252,6 +254,8 @@ async function init() {
 
 //#region ─── Prediction loop ──────────────────────────────────────────────────────────
 async function predictWebcam() {
+    if (!cameraRunning) return;
+
     canvasElement.width  = video.videoWidth;
     canvasElement.height = video.videoHeight;
 
@@ -330,6 +334,7 @@ async function predictWebcam() {
 init_btn.addEventListener('click', init);
 
 document.getElementById('stop-btn').addEventListener('click', () => {
+    cameraRunning = false;
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(t => t.stop());
         video.srcObject = null;
