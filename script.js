@@ -328,3 +328,15 @@ async function predictWebcam() {
 //#endregion
 
 init_btn.addEventListener('click', init);
+
+document.getElementById('stop-btn').addEventListener('click', () => {
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+    }
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    voteBuffer  = [];
+    holdingWord = null;
+    holdStart   = null;
+    updateDisplay(null);
+});
