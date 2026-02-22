@@ -26,7 +26,6 @@ let holdingWord  = null;
 let holdStart    = null;
 let lastCommit   = 0;
 let lastHandSeen = Date.now();
-let clearCooldown = false;
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
@@ -195,7 +194,6 @@ function getVotedWord(buffer) {
 }
 
 function commitWord(word) {
-    if (clearCooldown) return;
     const now = Date.now();
     if (now - lastCommit < COOLDOWN_MS) return;
     lastCommit   = now;
@@ -227,8 +225,6 @@ async function init() {
         holdingWord   = null;
         holdStart     = null;
         voteBuffer    = [];
-        clearCooldown = true;
-        setTimeout(() => { clearCooldown = false; }, 2500);
         updateDisplay(null);
         outputText.textContent = 'Waiting for signs...';
     });
