@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signify — ASL Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="asl-reference.css">
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    <div class="bg-lines"></div>
+
+    <nav>
+        <a href="index.html" class="logo">SIGNIFY</a>
+        <ul class="nav-links">
+            <li><a href="app.html">Home</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="asl-reference.html" style="color: #fff;">ASL Reference</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+        <a href="app.html" class="btn-launch">Try It →</a>
+    </nav>
+
+    <main>
+        <header class="page-header">
+            <p class="eyebrow">LEARN ASL</p>
+            <h1>ASL <span>Alphabet</span> Reference</h1>
+            <p class="subtitle">Learn the 26 hand shapes used in American Sign Language fingerspelling. Each letter has a unique handshape — practice them to start communicating!</p>
+        </header>
+
+        <!-- Search -->
+        <div class="search-row">
+            <input type="text" id="search" placeholder="Search a letter..." autocomplete="off" />
+        </div>
+
+        <!-- Grid -->
+        <div class="alphabet-grid" id="alphabet-grid"></div>
+
+        <!-- CTA -->
+        <div class="cta-row">
+            <a href="app.html" class="btn-primary">Try Signing Now →</a>
+            <a href="how-it-works.html" class="btn-ghost">How It Works</a>
+        </div>
+    </main>
+
+    <p class="footer-credit">GRIZZLY HACKS II &nbsp;·&nbsp; BUILT WITH MEDIAPIPE</p>
+
+    <script>
+        const ASL = [
+            { letter: 'A', emoji: '✊', desc: 'Closed fist with thumb resting on the side' },
+            { letter: 'B', emoji: '🖐️', desc: 'Flat hand, fingers together, thumb tucked across palm' },
+            { letter: 'C', emoji: '🤏', desc: 'Curved hand forming a C shape, fingers and thumb bent' },
+            { letter: 'D', emoji: '👆', desc: 'Index finger points up, other fingers curl to touch thumb' },
+            { letter: 'E', emoji: '🤛', desc: 'All fingers bent down, thumb tucked under fingers' },
+            { letter: 'F', emoji: '👌', desc: 'Index finger and thumb touch to form a circle, other fingers up' },
+            { letter: 'G', emoji: '👉', desc: 'Index finger and thumb point horizontally to the side' },
+            { letter: 'H', emoji: '✌️', desc: 'Index and middle fingers extended together, pointing sideways' },
+            { letter: 'I', emoji: '🤙', desc: 'Pinky finger extended upward, all other fingers closed' },
+            { letter: 'J', emoji: '🤙', desc: 'Pinky up, then trace a J shape in the air' },
+            { letter: 'K', emoji: '✌️', desc: 'Index and middle fingers up in a V, thumb between them' },
+            { letter: 'L', emoji: '🤙', desc: 'Thumb and index finger extend to form an L shape' },
+            { letter: 'M', emoji: '✊', desc: 'Three fingers (index, middle, ring) folded over tucked thumb' },
+            { letter: 'N', emoji: '✊', desc: 'Two fingers (index, middle) folded over tucked thumb' },
+            { letter: 'O', emoji: '👌', desc: 'All fingers curve to touch the thumb, forming an O shape' },
+            { letter: 'P', emoji: '👇', desc: 'Like K but pointed downward toward the floor' },
+            { letter: 'Q', emoji: '👇', desc: 'Like G but pointed downward toward the floor' },
+            { letter: 'R', emoji: '🤞', desc: 'Index and middle fingers crossed over each other' },
+            { letter: 'S', emoji: '✊', desc: 'Closed fist with thumb wrapped over the front of fingers' },
+            { letter: 'T', emoji: '✊', desc: 'Thumb tucked between index and middle fingers in a fist' },
+            { letter: 'U', emoji: '✌️', desc: 'Index and middle fingers extended straight up together' },
+            { letter: 'V', emoji: '✌️', desc: 'Index and middle fingers spread apart in a V shape' },
+            { letter: 'W', emoji: '🖖', desc: 'Index, middle, and ring fingers extended and spread apart' },
+            { letter: 'X', emoji: '☝️', desc: 'Index finger bent into a hook shape, like a crooked finger' },
+            { letter: 'Y', emoji: '🤙', desc: 'Thumb and pinky extended outward, middle fingers closed' },
+            { letter: 'Z', emoji: '☝️', desc: 'Index finger traces a Z shape in the air' },
+        ];
+
+        const grid = document.getElementById('alphabet-grid');
+        const search = document.getElementById('search');
+
+        function render(data) {
+            grid.innerHTML = data.map((item, i) => `
+                <div class="letter-card" style="--i:${i}">
+                    <div class="letter-top">
+                        <span class="letter-char">${item.letter}</span>
+                        <span class="letter-emoji">${item.emoji}</span>
+                    </div>
+                    <p class="letter-desc">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        search.addEventListener('input', () => {
+            const q = search.value.toUpperCase().trim();
+            render(q ? ASL.filter(a => a.letter.includes(q)) : ASL);
+        });
+
+        render(ASL);
+    </script>
+</body>
+</html>
