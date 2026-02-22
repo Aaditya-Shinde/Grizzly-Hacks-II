@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signify — How It Works</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="how-it-works.css">
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="bg-lines"></div>
+
+    <!-- Nav -->
+    <nav>
+        <a href="index.html" class="logo">SIGNIFY</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="app.html">App</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+        <a href="app.html" class="btn-launch">Launch App →</a>
+    </nav>
+
+    <main>
+         <!-- Header -->
+        <header class="page-header">
+            <p class="eyebrow">UNDER THE HOOD</p>
+            <h1>How <span>Signify</span> Works</h1>
+            <p class="subtitle">From your hand to the screen in milliseconds — here's what's happening behind the scenes.</p>
+        </header>
+
+        <!-- Steps -->
+        <section class="steps">
+
+            <div class="step" style="--i:0">
+                <div class="step-number">01</div>
+                <div class="step-body">
+                    <div class="step-icon">📷</div>
+                    <h2>Camera Capture</h2>
+                    <p>Your browser requests webcam access via the <code>getUserMedia</code> API. Video frames are streamed live into a <code>&lt;video&gt;</code> element at up to 30fps — no data ever leaves your device.</p>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="step" style="--i:1">
+                <div class="step-number">02</div>
+                <div class="step-body">
+                    <div class="step-icon">🤖</div>
+                    <h2>MediaPipe Gesture Recognition</h2>
+                    <p>Each frame is processed by <strong>MediaPipe's Gesture Recognizer</strong> (v0.10.3) running entirely in your browser via WebAssembly. It detects 21 hand landmarks per hand and classifies gestures in real time using a pre-trained TFLite model.</p>
+                    <div class="tag-row">
+                        <span class="tag">WASM</span>
+                        <span class="tag">TFLite</span>
+                        <span class="tag">GPU / XNNPACK</span>
+                        <span class="tag">LIVE_STREAM mode</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="step" style="--i:2">
+                <div class="step-number">03</div>
+                <div class="step-body">
+                    <div class="step-icon">📐</div>
+                    <h2>Geometric Word Classifier</h2>
+                    <p>On top of MediaPipe's built-in gestures, we built a custom <strong>landmark geometry classifier</strong>. It normalises the 21 hand landmarks relative to the wrist, measures finger extension ratios and inter-finger distances, and maps specific hand shapes to ASL words like <em>hello</em>, <em>water</em>, <em>please</em>, <em>drink</em>, and more.</p>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="step" style="--i:3">
+                <div class="step-number">04</div>
+                <div class="step-body">
+                    <div class="step-icon">🗳️</div>
+                    <h2>Vote Buffer & Hold Detection</h2>
+                    <p>To avoid flickering, detections are passed through a <strong>10-frame vote buffer</strong>. A word is only considered "detected" when it appears in ≥60% of recent frames. You then hold the sign for <strong>500ms</strong> to commit it — preventing accidental triggers mid-gesture.</p>
+                    <div class="tag-row">
+                        <span class="tag">60% threshold</span>
+                        <span class="tag">500ms hold</span>
+                        <span class="tag">800ms cooldown</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="step" style="--i:4">
+                <div class="step-number">05</div>
+                <div class="step-body">
+                    <div class="step-icon">📝</div>
+                    <h2>Sentence Building & History</h2>
+                    <p>Committed words are appended into a live sentence displayed on screen. Every word is saved to <strong>localStorage</strong> with a frequency count, powering the "Frequent Signs" panel and the full History page — so you and your family can track and learn the most used signs over time.</p>
+                </div>
+            </div>
+
+            <div class="connector"></div>
+
+            <div class="step" style="--i:5">
+                <div class="step-number">06</div>
+                <div class="step-body">
+                    <div class="step-icon">🎙️</div>
+                    <h2>Speech to Text Mode</h2>
+                    <p>Switch modes and Signify uses the browser's built-in <strong>Web Speech API</strong> with continuous listening and interim results — so spoken words appear on screen in real time as you talk, with no external service or API key required.</p>
+                    <div class="tag-row">
+                        <span class="tag">Web Speech API</span>
+                        <span class="tag">Continuous mode</span>
+                        <span class="tag">100% in-browser</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="cta-row">
+            <a href="app.html" class="btn-primary">Try It Yourself →</a>
+            <a href="index.html" class="btn-ghost">← Back to Home</a>
+        </div>
+    </main>
+
+    <p class="footer-credit">GRIZZLY HACKS II &nbsp;·&nbsp; BUILT WITH MEDIAPIPE</p>
+</body>
+</html>

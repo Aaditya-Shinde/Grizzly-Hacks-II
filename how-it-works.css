@@ -1,0 +1,294 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --purple: #bb88eb;
+    --cyan:   #00ccff;
+    --bg:     #03040b;
+}
+
+body {
+    background: var(--bg);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ── Background ── */
+.bg-glow {
+    position: fixed;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 1000px; height: 600px;
+    background: radial-gradient(ellipse, rgba(187,136,235,0.12) 0%, rgba(3,4,11,0) 65%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-lines {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 100px
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Nav ── */
+nav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.8rem 3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--purple);
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #606880;
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover { color: #fff; }
+
+.btn-launch {
+    background: var(--purple);
+    color: #0a0212;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.55rem 1.3rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-launch:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* ── Main ── */
+main {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+}
+
+/* ── Header ── */
+.page-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fadeUp 0.8s ease both;
+}
+
+.eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    margin-bottom: 1rem;
+}
+
+.page-header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+}
+
+.page-header h1 span {
+    background: linear-gradient(90deg, #fff 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: #606880;
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+/* ── Steps ── */
+.steps {
+    display: flex;
+    flex-direction: column;
+}
+
+.step {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    opacity: 0;
+    animation: fadeUp 0.7s ease calc(var(--i) * 0.12s) forwards;
+}
+
+.step-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(187,136,235,0.4);
+    letter-spacing: 1px;
+    padding-top: 0.3rem;
+    min-width: 28px;
+}
+
+.step-body {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 1.5rem 1.8rem;
+    transition: border-color 0.3s;
+}
+
+.step-body:hover {
+    border-color: rgba(187,136,235,0.25);
+}
+
+.step-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.7rem;
+}
+
+.step-body h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 0.6rem;
+}
+
+.step-body p {
+    color: #7a8099;
+    font-size: 0.9rem;
+    line-height: 1.75;
+}
+
+.step-body p strong { color: #c8cfea; font-weight: 500; }
+.step-body p em    { color: var(--cyan); font-style: normal; }
+
+.step-body code {
+    background: rgba(0,204,255,0.1);
+    color: var(--cyan);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-family: 'Space Mono', monospace;
+}
+
+/* ── Tags ── */
+.tag-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.tag {
+    background: rgba(0,204,255,0.07);
+    border: 1px solid rgba(0,204,255,0.2);
+    color: var(--cyan);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* ── Connector line ── */
+.connector {
+    width: 1px;
+    height: 28px;
+    background: linear-gradient(to bottom, rgba(187,136,235,0.3), rgba(187,136,235,0.05));
+    margin-left: calc(28px + 1.5rem + 1.8rem);
+}
+
+/* ── CTA ── */
+.cta-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 3.5rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.8s ease both;
+    opacity: 0;
+}
+
+.btn-primary {
+    background: var(--purple);
+    color: #0a0212;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 25px rgba(187,136,235,0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(187,136,235,0.5);
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #606880;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-ghost:hover {
+    color: #fff;
+    border-color: rgba(255,255,255,0.25);
+}
+
+/* ── Footer ── */
+.footer-credit {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding-bottom: 2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #6b7280;
+    letter-spacing: 1px;
+}
+
+/* ── Animation ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
