@@ -30,7 +30,7 @@ let clearCooldown = false;
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
-const HOLD_MS        = 2000;
+const HOLD_MS        = 500;
 const COOLDOWN_MS    = 800;
 const WORD_GAP_MS    = 3000;
 
