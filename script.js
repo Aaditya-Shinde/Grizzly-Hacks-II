@@ -39,95 +39,16 @@ const VOTE_THRESHOLD = 0.60;
 const HOLD_MS        = 500;
 const COOLDOWN_MS    = 800;
 
-//#region ─── Landmark geometry helpers ────────────────────────────────────────────────
-function normalizeLandmarks(raw) {
-    const wx = raw[0][0], wy = raw[0][1], wz = raw[0][2];
-    const translated = raw.map(p => [p[0] - wx, p[1] - wy, p[2] - wz]);
-    const m = translated[9];
-    const scale = Math.hypot(m[0], m[1], m[2]) || 1;
-    return translated.map(p => [p[0] / scale, p[1] / scale, p[2] / scale]);
-}
-
-function d(a, b) {
-    return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
-}
-
-function fromWrist(p) {
-    return Math.hypot(p[0], p[1], p[2]);
-}
-
-function extended(tip, pip, threshold = 1.2) {
-    return fromWrist(tip) > fromWrist(pip) * threshold;
-}
-
-function thumbHoriz(lm) {
-    return Math.abs(lm[4][0] - lm[1][0]) > Math.abs(lm[4][1] - lm[1][1]);
-}
-//#endregion
-
-//#region ─── ASL Word Classifier ──────────────────────────────────────────────────────
-function classifyWord(rawLandmarks) {
-    const lm = normalizeLandmarks(rawLandmarks);
-
-    const TH = extended(lm[4],  lm[3]);
-    const IX = extended(lm[8],  lm[6]);
-    const MD = extended(lm[12], lm[10]);
-    const RN = extended(lm[16], lm[14]);
-    const PK = extended(lm[20], lm[18]);
-
-    const thumbToIndex   = d(lm[4], lm[8]);
-    const thumbToMiddle  = d(lm[4], lm[12]);
-    const indexToMiddle  = d(lm[8], lm[12]);
-    const thumbToIdxBase = d(lm[4], lm[5]);
-
-    if (!TH && IX && MD && RN && PK) {
-        if (thumbToIndex < 0.5) return 'please';
-        return 'hello';
-    }
-    if (!TH && IX && MD && RN && !PK) return 'water';
-    if (!TH && IX && MD && !RN && !PK) {
-        if (indexToMiddle < 0.25) return 'see';
-        if (indexToMiddle >= 0.5) return 'no';
-        return 'look';
-    }
-    if (!TH && IX && !MD && !RN && PK) return 'callonphone';
-    if (TH && !IX && !MD && !RN && PK) return 'callonphone';
-    if (TH && IX && !MD && !RN && PK) return 'yes';
-    if (!TH && IX && !MD && !RN && !PK) return 'up';
-    if (!TH && !IX && !MD && !RN && PK) return 'quiet';
-    if (TH && IX && MD && !RN && !PK) return 'drink';
-    if (TH && IX && !MD && !RN && !PK) {
-        if (thumbHoriz(lm)) return 'like';
-        return 'find';
-    }
-    if (TH && IX && MD && RN && PK) return 'open';
-    if (!TH && !IX && MD && RN && PK && thumbToIndex < 0.6) return 'fine';
-    if (!IX && !MD && !RN && !PK) {
-        if (!TH) {
-            const ixOver = lm[8][1]  > lm[4][1];
-            const mdOver = lm[12][1] > lm[4][1];
-            if (ixOver && mdOver) return 'period';
-            if (fromWrist(lm[8]) < 0.8) return 'no';
-            return 'period';
-        }
-        if (thumbHoriz(lm)) return 'yes';
-        if (thumbToIdxBase < 0.7) return 'think';
-        if (thumbToIndex < 1.0) return 'yes';
-        return 'yes';
-    }
-    return null;
-}
-//#endregion
-
 //#region ─── MediaPipe gesture → ASL word mapping ─────────────────────────────────────
 const GESTURE_MAP = {
-    'Thumb_Up':    'yes',
-    'Thumb_Down':  'no',
-    'Closed_Fist': 'period',
-    'Open_Palm':   'hello',
-    'Pointing_Up': 'up',
-    'Victory':     'no',
-    'ILoveYou':    'I love you',
+    'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E', 'F': 'F', 
+    'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J', 'K': 'K', 'L': 'L', 
+    'M': 'M', 'N': 'N', 'O': 'O', 'P': 'P', 'Q': 'Q', 'R': 'R', 
+    'S': 'S', 'T': 'T', 'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 
+    'Y': 'Y', 'Z': 'Z',
+    'space': ' ', 
+    'del': 'DELETE',
+    'none': ''
 };
 
 function updateDisplay(detected) {
@@ -172,7 +93,8 @@ function commitWord(word) {
     lastCommit = now;
     prevWord   = word;
 
-    sentence += (sentence && word != '.') ? ' ' + word : word;
+    console.log(word);
+    sentence += word;
     wordCounts[word] = (wordCounts[word] || 0) + 1;
     localStorage.setItem('signify_wordCounts', JSON.stringify(wordCounts));
     wordHistory.push({ word, time: Date.now() });
@@ -240,7 +162,7 @@ async function init() {
 
     gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
         baseOptions: {
-            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+            modelAssetPath: "gesture_recognizer.task",
             delegate: "GPU"
         },
         runningMode: "LIVE_STREAM",
@@ -290,20 +212,16 @@ async function predictWebcam() {
                 word = GESTURE_MAP[gestureLabel] || null;
             }
 
-            if (!word && results.landmarks.length > 0) {
-                const rawLandmarks = results.landmarks[0].map(lm => [lm.x, lm.y, lm.z]);
-                word = classifyWord(rawLandmarks);
-            }
-
             if (word) {
                 voteBuffer.push(word);
                 if (voteBuffer.length > VOTE_WINDOW) voteBuffer.shift();
 
                 const voted = getVotedWord(voteBuffer);
                 if (voted) {
-                    if (voted === "period") {
+                    console.log(voted)
+                    if (voted == "del") {
                         updateDisplay("period");
-                        commitWord(".");
+                        commitWord(".");   
                     } else {
                         updateDisplay(voted);
                         if (holdingWord !== voted) {
