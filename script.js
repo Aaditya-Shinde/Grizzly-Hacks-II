@@ -171,10 +171,27 @@ async function init() {
         sentence    = '';
         handlerType = 'speech';
         currentWordDisplay.textContent = '🎙 Listening...';
-        outputText.textContent = 'Start speaking...';
-        if (recognition) {
-            try { recognition.start(); } catch (_) { /* already running is fine */ }
-        }
+        outputText.textContent = 'Requesting microphone...';
+
+        // getUserMedia first — surfaces macOS system-level permission issues
+        // that recognition.start() silently swallows
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(() => {
+                outputText.textContent = 'Start speaking...';
+                if (recognition) {
+                    try { recognition.start(); } catch (_) {}
+                }
+            })
+            .catch((err) => {
+                currentWordDisplay.textContent = '🚫 No mic';
+                if (err.name === 'NotAllowedError') {
+                    outputText.textContent = 'Mic blocked. On Mac: System Settings → Privacy & Security → Microphone → enable Chrome.';
+                } else if (err.name === 'NotFoundError') {
+                    outputText.textContent = 'No microphone found on this device.';
+                } else {
+                    outputText.textContent = 'Microphone error: ' + err.message;
+                }
+            });
     });
 
     updateDisplay(null);
