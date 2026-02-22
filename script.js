@@ -11,9 +11,12 @@ const outputText         = document.getElementById("output-text");
 const topSignsList       = document.getElementById("top-signs-list");
 const currentWordDisplay = document.getElementById("current-word-display");
 const clearWordBtn       = document.getElementById("clear-word-btn");
+const signBtn       = document.getElementById("sign-to-text-btn");
+const speechBtn       = document.getElementById("speech-to-text-btn");
 
 let gestureRecognizer;
 let SpeechRecognition;
+let recognition;
 let lastVideoTime = -1;
 let cameraRunning = false;
 
@@ -27,6 +30,7 @@ var holdingWord;
 var holdStart;
 var lastCommit = 0;
 var prevWord = "";
+var handlerType = 'speech';
 
 const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
@@ -221,46 +225,23 @@ function startWebcam() {
     cameraRunning = true;
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
-        video.addEventListener("loadeddata", predictWebcam);
+        video.addEventListener("loadeddata", handler);
     });
 }
 
 function startAudio(){
     let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        console.log("Sorry, your browser does not support the Web Speech API. Try Chrome or Safari.");
+        document.getElementById('output').innerText = "Sorry, your browser does not support the Web Speech API. Try Chrome.";
     } else {
-        const recognition = new SpeechRecognition();
+        recognition = new SpeechRecognition();
         
         // Configuration
         recognition.continuous = true; // Keep listening even if user pauses
         recognition.interimResults = true; // Show results as you speak
         recognition.lang = 'en-US';
 
-        recognition.start();
-
-        // stopBtn.addEventListener('click', () => {
-        //     recognition.stop();
-        //     startBtn.disabled = false;
-        //     stopBtn.disabled = true;
-        //     status.innerText = "Status: Stopped";
-        // });
-
-        recognition.onresult = (event) => {
-            let finalTranscript = '';
-            let interimTranscript = '';
-
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                } else {
-                    interimTranscript += event.results[i][0].transcript;
-                }
-            }
-
-            // output.innerHTML = `<strong>${finalTranscript}</strong> <span style="color: #999">${interimTranscript}</span>`;
-            console.log(interimTranscript);
-        };
+        recognition.onresult = handler;
     }
 }
 
@@ -273,6 +254,20 @@ async function init() {
         updateDisplay(null);
         outputText.textContent = 'Waiting for signs...';
     });
+
+    signBtn.addEventListener('click', () => {
+        sentence = '';
+        handlerType = 'sign';
+        console.log(handlerType);
+        recognition.stop();
+    });
+
+    speechBtn.addEventListener('click', () => {
+        handlerType = 'speech';
+        console.log(handlerType);
+        recognition.start();
+    });
+
 
     updateDisplay(null);
     updateTopSigns();
@@ -292,6 +287,7 @@ async function init() {
     
     startAudio();
     startWebcam();
+    recognition.start();
 }
 //#endregion
 
@@ -343,6 +339,7 @@ async function predictWebcam() {
 
                 if (voted) {
                     if (voted == "period"){
+                        updateDisplay("period");
                         commitWord(".");
                     } else {
                         // Show currently detected word while holding
@@ -375,24 +372,30 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
 }
 
-async function predictSpeech(){
-    let finalTranscript = '';
+async function predictSpeech(event){
     let interimTranscript = '';
 
     for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            sentence += '.';
         } else {
             interimTranscript += event.results[i][0].transcript;
+            sentence = interimTranscript;
         }
     }
-
-    // output.innerHTML = `<strong>${finalTranscript}</strong> <span style="color: #999">${interimTranscript}</span>`;
-    console.log(interimTranscript);
+    
+    updateDisplay("Speech Detection");
 }
 
-async function handler(){
-    
+async function handler(event){
+    console.log(handlerType);
+    if (handlerType == 'speech'){
+
+        predictSpeech(event);
+    } else if (handlerType == 'sign'){
+
+        predictWebcam();
+    }
 }
 
 //#endregion
