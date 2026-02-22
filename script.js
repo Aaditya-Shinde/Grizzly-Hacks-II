@@ -16,6 +16,7 @@ const speechBtn          = document.getElementById("speech-to-text-btn");
 
 let gestureRecognizer;
 let recognition;
+let requestId;
 let lastVideoTime = -1;
 let cameraRunning = false;
 

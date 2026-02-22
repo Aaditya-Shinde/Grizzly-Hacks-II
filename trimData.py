@@ -4,7 +4,7 @@ import shutil
 
 og = 'asl_alphabet'
 new = 'asl_alphabet_trimmed'
-samples_per_folder = 500
+samples_per_folder = 150
 
 if not os.path.exists(new):
     os.makedirs(new)
