@@ -34,7 +34,7 @@ const HOLD_MS        = 2000;
 const COOLDOWN_MS    = 800;
 const WORD_GAP_MS    = 3000;
 
-// ─── Landmark geometry helpers ────────────────────────────────────────────────
+//#region ─── Landmark geometry helpers ────────────────────────────────────────────────
 function normalizeLandmarks(raw) {
     const wx = raw[0][0], wy = raw[0][1], wz = raw[0][2];
     const translated = raw.map(p => [p[0] - wx, p[1] - wy, p[2] - wz]);
@@ -58,8 +58,9 @@ function extended(tip, pip, threshold = 1.2) {
 function thumbHoriz(lm) {
     return Math.abs(lm[4][0] - lm[1][0]) > Math.abs(lm[4][1] - lm[1][1]);
 }
+//#endregion
 
-// ─── ASL Word Classifier ──────────────────────────────────────────────────────
+//#region ─── ASL Word Classifier ──────────────────────────────────────────────────────
 // Maps hand landmark geometry to words from the downloaded ASL Signs dataset.
 // Covers signs with recognisable static handshapes; motion-based signs return null.
 function classifyWord(rawLandmarks) {
@@ -143,7 +144,9 @@ function classifyWord(rawLandmarks) {
     return null;
 }
 
-// ─── MediaPipe gesture → ASL word mapping ─────────────────────────────────────
+//#endregion
+
+//#region ─── MediaPipe gesture → ASL word mapping ─────────────────────────────────────
 // Primary classifier — runs before geometric fallback.
 const GESTURE_MAP = {
     'Thumb_Up':    'yes',     // thumbs up ≈ yes
@@ -180,8 +183,9 @@ function updateTopSigns() {
         </li>`
     ).join('');
 }
+//#endregion
 
-// ─── Word commit logic ────────────────────────────────────────────────────────
+//#region ─── Word commit logic ────────────────────────────────────────────────────────
 function getVotedWord(buffer) {
     if (buffer.length < 3) return null;
     const counts = {};
@@ -207,7 +211,9 @@ function commitWord(word) {
     updateTopSigns();
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+//#endregion
+
+//#region ─── Init ─────────────────────────────────────────────────────────────────────
 function startWebcam() {
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         video.srcObject = stream;
@@ -216,6 +222,20 @@ function startWebcam() {
 }
 
 async function init() {
+    clearWordBtn.addEventListener('click', () => {
+        sentence      = '';
+        holdingWord   = null;
+        holdStart     = null;
+        voteBuffer    = [];
+        clearCooldown = true;
+        setTimeout(() => { clearCooldown = false; }, 2500);
+        updateDisplay(null);
+        outputText.textContent = 'Waiting for signs...';
+    });
+
+    updateDisplay(null);
+    updateTopSigns();
+
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
     );
@@ -230,9 +250,11 @@ async function init() {
     });
 
     startWebcam();
+    
 }
+//#endregion
 
-// ─── Prediction loop ──────────────────────────────────────────────────────────
+//#region ─── Prediction loop ──────────────────────────────────────────────────────────
 async function predictWebcam() {
     canvasElement.width  = video.videoWidth;
     canvasElement.height = video.videoHeight;
@@ -307,18 +329,6 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
-clearWordBtn.addEventListener('click', () => {
-    sentence      = '';
-    holdingWord   = null;
-    holdStart     = null;
-    voteBuffer    = [];
-    clearCooldown = true;
-    setTimeout(() => { clearCooldown = false; }, 2500);
-    updateDisplay(null);
-    outputText.textContent = 'Waiting for signs...';
-});
+//#endregion
 
-updateDisplay(null);
-updateTopSigns();
 init_btn.addEventListener('click', init);
