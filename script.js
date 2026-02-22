@@ -32,7 +32,6 @@ const VOTE_WINDOW    = 10;
 const VOTE_THRESHOLD = 0.60;
 const HOLD_MS        = 500;
 const COOLDOWN_MS    = 800;
-const WORD_GAP_MS    = 3000;
 
 //#region ─── Landmark geometry helpers ────────────────────────────────────────────────
 function normalizeLandmarks(raw) {
@@ -155,7 +154,7 @@ const GESTURE_MAP = {
     'Open_Palm':   'hello',   // open palm ≈ hello
     'Pointing_Up': 'up',      // index up ≈ up
     'Victory':     'no',      // V-shape ≈ no (two-finger wag)
-    'ILoveYou':    'yes',     // ILY shape
+    'ILoveYou':    'I love you',     // ILY shape
 };
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
