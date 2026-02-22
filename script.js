@@ -34,6 +34,7 @@ async function init(){
         numHands: 2
     });
 
+    recognition.start();
     startWebcam();
 }
 //#endregion
