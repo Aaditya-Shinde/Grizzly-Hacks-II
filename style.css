@@ -244,6 +244,7 @@ nav {
     height: 100%;
     object-fit: cover;
     position: absolute;
+    transform: scaleX(-1);
 }
 
 .word-builder {
