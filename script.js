@@ -187,6 +187,18 @@ function classifyASL(rawLandmarks) {
     return null;
 }
 
+// ─── MediaPipe gesture → ASL label mapping ────────────────────────────────────
+// Used as fallback when the geometric classifier returns null.
+const GESTURE_MAP = {
+    'Thumb_Up':    'A',      // thumbs up closely resembles ASL A
+    'Thumb_Down':  'A',      // downward thumb variant
+    'Closed_Fist': 'S',      // closed fist = ASL S
+    'Open_Palm':   'B',      // flat open hand = ASL B
+    'Pointing_Up': 'D',      // index pointing up = ASL D
+    'Victory':     'V',      // peace sign = ASL V
+    'ILoveYou':    'ILY',    // ILY handshape (thumb + index + pinky)
+};
+
 // ─── Display helpers ──────────────────────────────────────────────────────────
 function updateDisplay() {
     const building = currentWord ? ` [${currentWord}]` : '';
@@ -296,9 +308,15 @@ async function predictWebcam() {
                 drawingUtils.drawLandmarks(landmarks, { color: "#ffffff", lineWidth: 1 });
             }
 
-            // Classify using geometric ASL rules on the first hand's landmarks
+            // 1. Try geometric ASL classifier on hand landmarks
             const rawLandmarks = results.landmarks[0].map(lm => [lm.x, lm.y, lm.z]);
-            const letter = classifyASL(rawLandmarks);
+            let letter = classifyASL(rawLandmarks);
+
+            // 2. Fall back to MediaPipe gesture label if classifier returns null
+            if (!letter && results.gestures.length > 0) {
+                const gestureLabel = results.gestures[0][0].categoryName;
+                letter = GESTURE_MAP[gestureLabel] || null;
+            }
 
             if (letter) {
                 voteBuffer.push(letter);
