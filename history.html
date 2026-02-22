@@ -59,28 +59,26 @@
         const clearBtn = document.getElementById('clear-history-btn');
 
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('signify_history') || '[]');
-            if (history.length === 0) {
+            const counts = JSON.parse(localStorage.getItem('signify_wordCounts') || '{}');
+            const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            if (entries.length === 0) {
                 list.innerHTML = '<li style="color: #888;">No history found yet...</li>';
                 return;
             }
-            list.innerHTML = history
-                .slice()
-                .reverse()
-                .map(entry => {
-                    const date = new Date(entry.time).toLocaleTimeString();
-                    return `<li style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-                                       display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #00ccff;">${entry.word}</span>
-                                <span style="color: #555; font-size: 0.75rem;">${date}</span>
-                            </li>`;
-                })
+            list.innerHTML = entries
+                .map(([word, count]) =>
+                    `<li style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+                                display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #00ccff;">${word}</span>
+                        <span style="color: #a0a4b8; font-size: 0.85rem;">${count}x</span>
+                    </li>`
+                )
                 .join('');
         }
 
         clearBtn.addEventListener('click', () => {
             localStorage.removeItem('signify_history');
-            localStorage.removeItem('signify_letterCounts');
+            localStorage.removeItem('signify_wordCounts');
             loadHistory();
         });
 
