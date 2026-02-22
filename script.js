@@ -5,6 +5,7 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 
 const video = document.getElementById("webcam");
+const init_btn = document.getElementById("start-btn");
 const canvasElement = document.getElementById("cam-display");
 const canvasCtx = canvasElement.getContext("2d");
 
@@ -72,4 +73,4 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
 }
 
-init();
+init_btn.addEventListener('click', init);
