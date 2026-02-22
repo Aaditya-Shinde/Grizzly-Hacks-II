@@ -247,6 +247,41 @@ nav {
     transform: scaleX(-1);
 }
 
+.word-builder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#current-word-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00ccff;
+    letter-spacing: 6px;
+    min-height: 2.5rem;
+}
+
+#clear-word-btn {
+    background: rgba(255, 77, 77, 0.15);
+    border: 1px solid rgba(255, 77, 77, 0.5);
+    color: #ff4d4d;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+#clear-word-btn:hover {
+    background: rgba(255, 77, 77, 0.3);
+}
+
 .camera-overlay {
     position: absolute;
     top: 10px;

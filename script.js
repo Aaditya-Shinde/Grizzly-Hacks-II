@@ -4,11 +4,13 @@ import {
     DrawingUtils
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 
-const video         = document.getElementById("webcam");
-const canvasElement = document.getElementById("cam-display");
-const canvasCtx     = canvasElement.getContext("2d");
-const outputText    = document.getElementById("output-text");
-const topSignsList  = document.getElementById("top-signs-list");
+const video              = document.getElementById("webcam");
+const canvasElement      = document.getElementById("cam-display");
+const canvasCtx          = canvasElement.getContext("2d");
+const outputText         = document.getElementById("output-text");
+const topSignsList       = document.getElementById("top-signs-list");
+const currentWordDisplay = document.getElementById("current-word-display");
+const clearWordBtn       = document.getElementById("clear-word-btn");
 
 let gestureRecognizer;
 let lastVideoTime = -1;
@@ -201,8 +203,8 @@ const GESTURE_MAP = {
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
 function updateDisplay() {
-    const building = currentWord ? ` [${currentWord}]` : '';
-    outputText.textContent = (sentence + building) || 'Waiting for signs...';
+    currentWordDisplay.textContent = currentWord || '—';
+    outputText.textContent = sentence || 'Waiting for signs...';
 }
 
 function updateTopSigns() {
@@ -308,14 +310,17 @@ async function predictWebcam() {
                 drawingUtils.drawLandmarks(landmarks, { color: "#ffffff", lineWidth: 1 });
             }
 
-            // 1. Try geometric ASL classifier on hand landmarks
-            const rawLandmarks = results.landmarks[0].map(lm => [lm.x, lm.y, lm.z]);
-            let letter = classifyASL(rawLandmarks);
-
-            // 2. Fall back to MediaPipe gesture label if classifier returns null
-            if (!letter && results.gestures.length > 0) {
+            // 1. Try MediaPipe gesture recognizer first
+            let letter = null;
+            if (results.gestures.length > 0) {
                 const gestureLabel = results.gestures[0][0].categoryName;
                 letter = GESTURE_MAP[gestureLabel] || null;
+            }
+
+            // 2. Fall back to geometric ASL classifier for letters not in gesture map
+            if (!letter && results.landmarks.length > 0) {
+                const rawLandmarks = results.landmarks[0].map(lm => [lm.x, lm.y, lm.z]);
+                letter = classifyASL(rawLandmarks);
             }
 
             if (letter) {
@@ -355,6 +360,14 @@ async function predictWebcam() {
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
+clearWordBtn.addEventListener('click', () => {
+    currentWord   = '';
+    holdingLetter = null;
+    holdStart     = null;
+    voteBuffer    = [];
+    updateDisplay();
+});
+
 updateDisplay();
 updateTopSigns();
 init();
