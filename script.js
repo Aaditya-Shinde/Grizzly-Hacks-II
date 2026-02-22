@@ -90,15 +90,20 @@ function commitWord(word) {
     const now = Date.now();
     if (now - lastCommit < COOLDOWN_MS || word == prevWord) return;
 
-    lastCommit = now;
-    prevWord   = word;
+    if (word == 'DELETE'){
+        sentence = sentence.substring(0, sentence.length - 1);
+    } else {
+        lastCommit = now;
+        prevWord   = word;
 
-    console.log(word);
-    sentence += word;
-    wordCounts[word] = (wordCounts[word] || 0) + 1;
-    localStorage.setItem('signify_wordCounts', JSON.stringify(wordCounts));
-    wordHistory.push({ word, time: Date.now() });
-    localStorage.setItem('signify_history', JSON.stringify(wordHistory));
+        console.log(word);
+        sentence += word;
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
+        localStorage.setItem('signify_wordCounts', JSON.stringify(wordCounts));
+        wordHistory.push({ word, time: Date.now() });
+        localStorage.setItem('signify_history', JSON.stringify(wordHistory));
+    }
+
     holdingWord = null;
     holdStart   = null;
     updateDisplay(null);
@@ -218,18 +223,12 @@ async function predictWebcam() {
 
                 const voted = getVotedWord(voteBuffer);
                 if (voted) {
-                    console.log(voted)
-                    if (voted == "del") {
-                        updateDisplay("period");
-                        commitWord(".");   
-                    } else {
-                        updateDisplay(voted);
-                        if (holdingWord !== voted) {
-                            holdingWord = voted;
-                            holdStart   = nowInMs;
-                        } else if (nowInMs - holdStart >= HOLD_MS) {
-                            commitWord(voted);
-                        }
+                    updateDisplay(voted);
+                    if (holdingWord !== voted) {
+                        holdingWord = voted;
+                        holdStart   = nowInMs;
+                    } else if (nowInMs - holdStart >= HOLD_MS) {
+                        commitWord(voted);
                     }
                 }
             } else {
